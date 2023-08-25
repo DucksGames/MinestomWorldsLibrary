@@ -35,7 +35,11 @@ public class WorldInstance extends InstanceContainer {
 
         switch (worldInfo.worldLoader()) {
             case POLAR -> setChunkLoader(new PolarLoader(Path.of(directory.getPath() + separator + worldInfo.name() + ".polar")));
-            case TNT -> setChunkLoader(new TNTLoader(new FileTNTSource(Path.of(directory.getPath() + separator + worldInfo.name() + ".tnt")))); // TODO
+            case TNT -> {
+                File temp = new File(directory.getPath() + separator + worldInfo.name() + ".tnt");
+                if (!temp.exists()) temp.createNewFile();
+                setChunkLoader(new TNTLoader(new FileTNTSource(Path.of(directory.getPath() + separator + worldInfo.name() + ".tnt")))); // TODO
+            }
             case SLIME -> setChunkLoader(null); // TODO
             default -> setChunkLoader(new AnvilLoader(Path.of(directory.getPath() + separator + worldInfo.name())));
         }
