@@ -30,6 +30,7 @@ public class WorldManager {
         this.worldsDirectory = worldsDirectory;
         if (!worldsDirectory.exists()) worldsDirectory.mkdirs();
         MinecraftServer.getCommandManager().register(new SetWorldSpawn(this));
+        MinecraftServer.getSchedulerManager().buildShutdownTask(() -> shutdown());
     }
 
     public WorldManager() {

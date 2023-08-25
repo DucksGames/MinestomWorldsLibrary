@@ -1,8 +1,6 @@
 package com.ducksgames.worlds;
 
 import com.ducksgames.worlds.polar.PolarLoader;
-import dev.emortal.tnt.TNTLoader;
-import dev.emortal.tnt.source.FileTNTSource;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.instance.AnvilLoader;
@@ -35,12 +33,6 @@ public class WorldInstance extends InstanceContainer {
 
         switch (worldInfo.worldLoader()) {
             case POLAR -> setChunkLoader(new PolarLoader(Path.of(directory.getPath() + separator + worldInfo.name() + ".polar")));
-            case TNT -> {
-                File temp = new File(directory.getPath() + separator + worldInfo.name() + ".tnt");
-                if (!temp.exists()) temp.createNewFile();
-                setChunkLoader(new TNTLoader(new FileTNTSource(Path.of(directory.getPath() + separator + worldInfo.name() + ".tnt")))); // TODO
-            }
-            case SLIME -> setChunkLoader(null); // TODO
             default -> setChunkLoader(new AnvilLoader(Path.of(directory.getPath() + separator + worldInfo.name())));
         }
 
