@@ -72,7 +72,7 @@ public class WorldManager {
         world.directory().delete();
     }
 
-    public WorldInstance createWorld(@NotNull String name) {
+    public WorldInstance createWorld(@NotNull String name) throws IllegalArgumentException {
         return createWorld(name, unit -> {});
     }
 
@@ -146,6 +146,20 @@ public class WorldManager {
         }
 
         throw new IllegalArgumentException("A world with that name does not exist.");
+    }
+
+    public WorldInstance createOrLoad(@NotNull String name, @NotNull Generator generator) throws IllegalStateException {
+        try {
+            return loadWorld(name);
+        } catch (IllegalArgumentException e) {
+            return createWorld(name, generator);
+        } catch (IllegalStateException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public WorldInstance createOrLoad(@NotNull String name) throws IllegalStateException {
+        return createOrLoad(name, (unit) -> {});
     }
 
     private File infoFile(File worldDirectory) {
