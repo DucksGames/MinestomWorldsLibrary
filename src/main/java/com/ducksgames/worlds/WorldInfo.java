@@ -18,6 +18,7 @@ public class WorldInfo {
     public final static Logger LOGGER = LoggerFactory.getLogger(WorldInfo.class);
     private final static Gson gson = new GsonBuilder()
             .registerTypeAdapter(Pos.class, new PosSerializer())
+            .registerTypeAdapter(WorldLoader.class, new WorldLoaderSerializer())
             .enableComplexMapKeySerialization()
             .create();
 
@@ -29,6 +30,7 @@ public class WorldInfo {
     private List<String> authors;
     private HashMap<Object, Object> pluginInfo = new HashMap<>();
     private Pos spawn;
+    private WorldLoader loader;
 
     private WorldInfo() {}
 
@@ -69,6 +71,12 @@ public class WorldInfo {
         this.generatorArgs = generatorArgs;
     }
 
+    public WorldLoader worldLoader() {return loader;}
+
+    public void setWorldLoader(WorldLoader loader) {
+        this.loader = loader;
+    }
+
     public Pos spawn() {
         return spawn;
     }
@@ -101,13 +109,9 @@ public class WorldInfo {
             }
         }
 
-        if ( info == null ) {
-            info = new WorldInfo();
-        }
-
-        if ( info.name == null ) {
-            info.name = file.getParentFile().getName();
-        }
+        if (info == null) info = new WorldInfo();
+        if (info.name == null) info.name = file.getParentFile().getName();
+        if (info.loader == null) info.loader = WorldLoader.ANVIL;
 
         info.file = file;
         return info;
@@ -138,6 +142,18 @@ public class WorldInfo {
             return obj;
         }
 
+    }
+
+    private static class WorldLoaderSerializer implements JsonSerializer<WorldLoader>, JsonDeserializer<WorldLoader> {
+        @Override
+        public WorldLoader deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            return WorldLoader.fromId(json.getAsInt());
+        }
+
+        @Override
+        public JsonElement serialize(WorldLoader src, Type typeOfSrc, JsonSerializationContext context) {
+            return new JsonPrimitive(src.id());
+        }
     }
 
 

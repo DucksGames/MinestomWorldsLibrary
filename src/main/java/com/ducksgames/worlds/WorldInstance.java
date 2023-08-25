@@ -3,6 +3,7 @@ package com.ducksgames.worlds;
 import com.ducksgames.worlds.polar.PolarLoader;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
+import net.minestom.server.instance.AnvilLoader;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.world.DimensionType;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +27,13 @@ public class WorldInstance extends InstanceContainer {
     public WorldInstance(@NotNull File directory, WorldInfo worldInfo) throws IOException {
         super(UUID.randomUUID(), DimensionType.OVERWORLD);
 
-        setChunkLoader(new PolarLoader(Path.of(directory.getPath() + File.separator + worldInfo.name() + ".polar")));
+
+        if (worldInfo.worldLoader() == WorldLoader.POLAR)
+            setChunkLoader(new PolarLoader(Path.of(directory.getPath() + File.separator + worldInfo.name() + ".polar")));
+        else if (worldInfo.worldLoader() == WorldLoader.ANVIL)
+            setChunkLoader(new AnvilLoader(Path.of(directory.getPath() + File.separator + worldInfo.name())));
+        else if (worldInfo.worldLoader() == WorldLoader.TNT) // TODO add TNT support
+            setChunkLoader(new AnvilLoader(Path.of(directory.getPath() + File.separator + worldInfo.name())));
 
         enableAutoChunkLoad(true);
 

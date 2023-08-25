@@ -79,11 +79,11 @@ public class WorldManager {
         world.directory().delete();
     }
 
-    public WorldInstance createWorld(@NotNull String name) throws IllegalArgumentException {
-        return createWorld(name, unit -> {});
+    public WorldInstance createWorld(@NotNull String name, WorldLoader loader) throws IllegalArgumentException {
+        return createWorld(name, loader, unit -> {});
     }
 
-    public WorldInstance createWorld(@NotNull String name, @NotNull Generator generator) throws IllegalArgumentException {
+    public WorldInstance createWorld(@NotNull String name, WorldLoader loader, @NotNull Generator generator) throws IllegalArgumentException {
         if (worldByName(name).isPresent()) {
             throw new IllegalArgumentException("A world with that name already exists.");
         }
@@ -98,6 +98,7 @@ public class WorldManager {
 
         WorldInfo info = WorldInfo.of(infoFile(directory));
         info.setName(name);
+        info.setWorldLoader(loader);
 
         WorldInstance instance;
         try {
@@ -155,11 +156,11 @@ public class WorldManager {
         throw new IllegalArgumentException("A world with that name does not exist.");
     }
 
-    public WorldInstance createOrLoad(@NotNull String name, Consumer<WorldInstance> afterCreation, @NotNull Generator generator) throws IllegalStateException {
+    public WorldInstance createOrLoad(@NotNull String name, WorldLoader loader, Consumer<WorldInstance> afterCreation, @NotNull Generator generator) throws IllegalStateException {
         try {
             return loadWorld(name);
         } catch (IllegalArgumentException e) {
-            WorldInstance worldInstance = createWorld(name, generator);
+            WorldInstance worldInstance = createWorld(name, loader, generator);
             afterCreation.accept(worldInstance);
             return worldInstance;
         } catch (IllegalStateException e) {
@@ -167,12 +168,15 @@ public class WorldManager {
         }
     }
 
-    public WorldInstance createOrLoad(@NotNull String name, Consumer<WorldInstance> afterCreation) throws IllegalStateException {
-        return createOrLoad(name, afterCreation, (unit) -> {});
+    public WorldInstance createOrLoad(@NotNull String name, WorldLoader loader, Consumer<WorldInstance> afterCreation) throws IllegalStateException {
+        return createOrLoad(name, loader, afterCreation, (unit) -> {});
     }
 
+    public WorldInstance createOrLoad(@NotNull String name, WorldLoader loader) throws IllegalStateException {
+        return createOrLoad(name, loader, (world) -> world.worldInfo().setSpawn(new Pos(0, 64, 0)), (unit) -> {});
+    }
     public WorldInstance createOrLoad(@NotNull String name) throws IllegalStateException {
-        return createOrLoad(name, (world) -> world.worldInfo().setSpawn(new Pos(0, 64, 0)), (unit) -> {});
+        return createOrLoad(name, WorldLoader.ANVIL, (world) -> world.worldInfo().setSpawn(new Pos(0, 64, 0)), (unit) -> {});
     }
 
     private File infoFile(File worldDirectory) {
