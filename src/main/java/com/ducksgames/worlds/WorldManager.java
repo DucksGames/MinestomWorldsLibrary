@@ -2,6 +2,7 @@ package com.ducksgames.worlds;
 
 import com.ducksgames.worlds.commands.SetWorldSpawn;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.InstanceManager;
 import net.minestom.server.instance.generator.Generator;
@@ -14,6 +15,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class WorldManager {
@@ -148,18 +150,24 @@ public class WorldManager {
         throw new IllegalArgumentException("A world with that name does not exist.");
     }
 
-    public WorldInstance createOrLoad(@NotNull String name, @NotNull Generator generator) throws IllegalStateException {
+    public WorldInstance createOrLoad(@NotNull String name, Consumer<WorldInstance> afterCreation, @NotNull Generator generator) throws IllegalStateException {
         try {
             return loadWorld(name);
         } catch (IllegalArgumentException e) {
-            return createWorld(name, generator);
+            WorldInstance worldInstance = createWorld(name, generator);
+            afterCreation.accept(worldInstance);
+            return worldInstance;
         } catch (IllegalStateException e) {
             throw new IllegalStateException(e);
         }
     }
 
+    public WorldInstance createOrLoad(@NotNull String name, Consumer<WorldInstance> afterCreation) throws IllegalStateException {
+        return createOrLoad(name, afterCreation, (unit) -> {});
+    }
+
     public WorldInstance createOrLoad(@NotNull String name) throws IllegalStateException {
-        return createOrLoad(name, (unit) -> {});
+        return createOrLoad(name, (world) -> world.worldInfo().setSpawn(new Pos(0, 64, 0)), (unit) -> {});
     }
 
     private File infoFile(File worldDirectory) {
