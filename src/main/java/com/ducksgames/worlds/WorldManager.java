@@ -28,6 +28,7 @@ public class WorldManager {
 
     public WorldManager(File worldsDirectory) {
         this.worldsDirectory = worldsDirectory;
+        if (!worldsDirectory.exists()) worldsDirectory.mkdirs();
         MinecraftServer.getCommandManager().register(new SetWorldSpawn(this));
     }
 
