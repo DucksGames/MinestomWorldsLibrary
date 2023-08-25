@@ -8,6 +8,6 @@ Currently this Library uses a hard fork of Polar, this removes all support for m
 ### Quick Start
 ```Java
 WorldManager worldManager = new WorldManager(new File("worlds"));
-WorldInstance world = worldManager.createOrLoad("world", created -> created.worldInfo().setSpawn(new Pos(0, 22, 0)));
+WorldInstance world = worldManager.createOrLoad("world", WorldLoader.POLAR, created -> created.worldInfo().setSpawn(new Pos(0, 22, 0)));
 ```
 
