@@ -1,12 +1,16 @@
 package com.ducksgames.worlds;
 
 import com.ducksgames.worlds.polar.PolarLoader;
+import dev.emortal.tnt.TNTLoader;
+import dev.emortal.tnt.source.FileTNTSource;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.instance.AnvilLoader;
 import net.minestom.server.instance.InstanceContainer;
+import net.minestom.server.instance.generator.Generator;
 import net.minestom.server.world.DimensionType;
 import org.jetbrains.annotations.NotNull;
+import org.jglrxavpok.hephaistos.nbt.NBTException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +20,8 @@ import java.nio.file.Path;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import static java.io.File.separator;
+
 public class WorldInstance extends InstanceContainer {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(WorldInstance.class);
@@ -24,22 +30,20 @@ public class WorldInstance extends InstanceContainer {
 
     private final WorldInfo worldInfo;
 
-    public WorldInstance(@NotNull File directory, WorldInfo worldInfo) throws IOException {
+    public WorldInstance(@NotNull File directory, WorldInfo worldInfo) throws IOException, NBTException {
         super(UUID.randomUUID(), DimensionType.OVERWORLD);
 
-
-        if (worldInfo.worldLoader() == WorldLoader.POLAR)
-            setChunkLoader(new PolarLoader(Path.of(directory.getPath() + File.separator + worldInfo.name() + ".polar")));
-        else if (worldInfo.worldLoader() == WorldLoader.ANVIL)
-            setChunkLoader(new AnvilLoader(Path.of(directory.getPath() + File.separator + worldInfo.name())));
-        else if (worldInfo.worldLoader() == WorldLoader.TNT) // TODO add TNT support
-            setChunkLoader(new AnvilLoader(Path.of(directory.getPath() + File.separator + worldInfo.name())));
+        switch (worldInfo.worldLoader()) {
+            case POLAR -> setChunkLoader(new PolarLoader(Path.of(directory.getPath() + separator + worldInfo.name() + ".polar")));
+            case TNT -> setChunkLoader(new TNTLoader(new FileTNTSource(Path.of(directory.getPath() + separator + worldInfo.name() + ".tnt")))); // TODO
+            case SLIME -> setChunkLoader(null); // TODO
+            default -> setChunkLoader(new AnvilLoader(Path.of(directory.getPath() + separator + worldInfo.name())));
+        }
 
         enableAutoChunkLoad(true);
 
         this.directory = directory;
         this.worldInfo = worldInfo;
-
         // TODO apply generator from worldinfo file
 
         if ( !directory.exists() ) {

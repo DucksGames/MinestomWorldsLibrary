@@ -11,10 +11,12 @@ java.targetCompatibility = JavaVersion.VERSION_17
 repositories {
     mavenCentral()
     maven(url = "https://jitpack.io")
+    maven(url = "https://repo.emortal.dev/snapshots")
 }
 
 dependencies {
     implementation("com.github.luben:zstd-jni:1.5.5-3")
+    implementation("dev.emortal.tnt:TNT:5c369b2")
     compileOnly("com.github.Minestom:Minestom:c5047b8037")
 }
 publishing {

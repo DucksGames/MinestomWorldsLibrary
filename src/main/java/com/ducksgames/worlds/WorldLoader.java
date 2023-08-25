@@ -6,6 +6,7 @@ public enum WorldLoader {
     POLAR(1),
     ANVIL(2),
     TNT(3),
+    SLIME(4),
     ;
 
     private Integer id;
