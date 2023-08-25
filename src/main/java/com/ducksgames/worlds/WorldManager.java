@@ -76,7 +76,7 @@ public class WorldManager {
         return createWorld(name, unit -> {});
     }
 
-    public WorldInstance createWorld(@NotNull String name, @NotNull Generator generator) {
+    public WorldInstance createWorld(@NotNull String name, @NotNull Generator generator) throws IllegalArgumentException {
         if (worldByName(name).isPresent()) {
             throw new IllegalArgumentException("A world with that name already exists.");
         }
@@ -106,7 +106,7 @@ public class WorldManager {
         return instance;
     }
     
-    public WorldInstance loadWorld(@NotNull File directory) {
+    public WorldInstance loadWorld(@NotNull File directory) throws IllegalArgumentException{
         if (!directory.exists()) {
             throw new IllegalArgumentException("A world with that name does not exist.");
         }
@@ -124,7 +124,7 @@ public class WorldManager {
         return instance;
     }
 
-    public WorldInstance loadWorld(@NotNull String name) {
+    public WorldInstance loadWorld(@NotNull String name) throws IllegalArgumentException, IllegalStateException {
         File[] files = worldsDirectory.listFiles();
         if (files == null) {
             throw new IllegalStateException("Worlds directory does not exist.");
