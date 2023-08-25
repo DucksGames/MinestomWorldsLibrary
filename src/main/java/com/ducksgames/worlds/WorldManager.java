@@ -32,6 +32,10 @@ public class WorldManager {
         MinecraftServer.getCommandManager().register(new SetWorldSpawn(this));
     }
 
+    public WorldManager() {
+        this(new File("worlds"));
+    }
+
     public void shutdown() {
         try {
             saveAll().get();
